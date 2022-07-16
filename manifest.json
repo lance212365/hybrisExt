@@ -6,7 +6,7 @@
     "content_scripts": [
         {
           "matches": ["https://*:9002/hac/console/flexsearch"],
-          "js": ["content-script.js"]
+          "js": ["jquery-3.6.0.js","content-script.js"]
         }
       ],
       "background":{
