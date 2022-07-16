@@ -102,6 +102,36 @@ const saveExcelExecute = async()=>{
     
 }
 
+const saveDBExecute = async()=>{
+    const defaultName = "hybrisExport"
+    var filename = prompt("Save DB Title Name",defaultName);
+    if(!filename){
+        return;
+    }
+    if(filename === defaultName){
+        filename = defaultName + new Date().getTime();
+    }
+    let callback = async(data)=>{
+        let payload = {
+            title:filename,
+            data:data
+        }
+        payload['query'] = document.querySelector("#flexibleSearchQueryWrapper div.CodeMirror-sizer").innerText.trim().replace(/\s{2,}/gm," ");
+    
+        $.ajax({
+            url:'https://ftrhkexpress.grieverdeveloper.net/fsq/save',
+            //url:'https://localhost:5000/fsq/save',
+            data:JSON.stringify(payload),
+            type:'POST',
+            success:(response)=>{
+                alert(response);
+            }
+        })
+    }
+    abstractFsqSearch(callback);
+
+    
+}
 
 const saveExcel = async()=>{
     const defaultName = "hybrisExport"
@@ -212,13 +242,14 @@ document.querySelector('#tabsNoSidebar').parentElement.prepend(saveLoadButton);
 var clipboardResultButton = '<button id="buttonSubmitCopyResult" class="buttonSubmit" style="float: right;">Execute And Copy Result</button>'
 var CSVResultButton = '<button id="buttonSubmitCSV" class="buttonSubmit" style="float: right;">Execute And Export CSV</button>'
 var ExcelesultButton = '<button id="buttonSubmitExcel" class="buttonSubmit" style="float: right;">Execute And Export XLSX</button>'
+var SaveToDBButton = '<button id="buttonSubmitDB" class="buttonSubmit" style="float: right;">Execute And Export to DB</button>'
 
 const abstractFsqSearch = (callback)=>{
     if(callback == null){
         callback = (data)=>{console.log(data)}
     }
     var url = '/hac/console/flexsearch/execute'
-    var fsq = document.querySelector("#flexibleSearchQueryWrapper div.CodeMirror-sizer").innerText.replace(/(\r\n|\n|\r)/gm, "").trim();
+    var fsq = document.querySelector("#flexibleSearchQueryWrapper div.CodeMirror-sizer").innerText.trim().replace(/\s{2,}/gm,"");
     var sql = document.querySelector("#sqlQueryWrapper div.CodeMirror-sizer").innerText.replace(/(\r\n|\n|\r)/gm, "");
     var csrf = document.querySelector("meta[name='_csrf']").content;
     if(fsq.length>0){
@@ -248,8 +279,10 @@ const abstractFsqSearch = (callback)=>{
 $("#buttonSubmit1").before(clipboardResultButton);
 $("#buttonSubmit1").before(ExcelesultButton);
 $("#buttonSubmit1").before(CSVResultButton);
+$("#buttonSubmit1").before(SaveToDBButton);
 $("#buttonSubmitCSV").on('click',saveCSVExecute)
 $("#buttonSubmitExcel").on('click',saveExcelExecute)
+$("#buttonSubmitDB").on('click',saveDBExecute);
 $("#buttonSubmitCopyResult").on("click",function (){
     let action = async(data)=>{
         if(data.resultList && data.headers){
